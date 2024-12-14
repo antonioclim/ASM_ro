@@ -1,0 +1,50 @@
+; Implementa?i un algoritm care calculeaz? media elementelor unei matrice de WORD-uri
+; (o versiune fara loop pt matrici de dimensiuni mici)
+org 100h       ; Program pentru un fi?ier .com (executabil mic)
+
+;-------------------------
+; Ini?ializarea segmentului de date
+;-------------------------
+mov ax, @data  ; Setam segmentul de date
+mov ds, ax     ; DS = ax (segmentul pentru accesarea datelor)
+
+;-------------------------
+; Calcularea sumei
+;-------------------------
+mov ax, [matrix]        ; Încarca primul element (10) în AX
+add ax, [matrix+2]      ; Adauga al doilea element (20)
+add ax, [matrix+4]      ; Adauga al treilea element (30)
+add ax, [matrix+6]      ; Adauga al patrulea element (40)
+add ax, [matrix+8]      ; Adauga al cincilea element (50)
+
+;-------------------------
+; Calcularea mediei
+;-------------------------
+mov bx, matrix_size      ; BX = dimensiunea matricei (5)
+xor dx, dx               ; Resetam DX pentru divizare
+div bx                   ; DX:AX / BX => AX con?ine rezultatul (media)
+
+;-------------------------
+; Stocarea rezultatului
+;-------------------------
+mov avg, ax              ; Salvam media calculata în variabila `avg`
+
+;-------------------------
+; Terminarea programului
+;-------------------------
+mov ah, 4Ch              ; Func?ia DOS pentru terminare
+int 21h                  ; Terminare program
+
+;-------------------------
+; Segmentul de date
+;-------------------------
+data segment
+matrix dw 10, 20, 30, 40, 50 ; Matrice de 5 elemente (WORD-uri)
+matrix_size dw 5              ; Dimensiunea matricei
+avg dw ?                      ; Variabila pentru media calculata
+data ends
+
+
+
+
+; [SOURCE]: C:\emu8086\MySource\A132ALGaverageELEMENTSwordMATRIX.asm
