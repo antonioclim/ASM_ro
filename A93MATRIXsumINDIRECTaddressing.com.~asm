@@ -1,0 +1,51 @@
+; (Adresare indirecta) Realiza?i o sum? a tuturor elementelor dintr-o matrice utilizând adresare indirect?
+
+org 100h       ; Program pentru un fi?ier .com (executabil mic)
+
+;-------------------------
+; Ini?ializarea segmentului de date
+;-------------------------
+mov ax, @data  ; Setam segmentul de date
+mov ds, ax     ; DS = ax (segmentul pentru date)
+
+;-------------------------
+; Ini?ializarea variabilelor
+;-------------------------
+mov si, offset matrix ; SI indica începutul matricei
+mov cx, 9             ; Numarul de elemente din matrice (3x3 = 9)
+xor ax, ax            ; AX = 0 (ini?ializarea sumei totale)
+
+;-------------------------
+; Calculul sumei
+;-------------------------
+sum_loop:
+mov bl, [si]         ; Încarca un element al matricei în registrul BL (adresare indirecta)
+add ax, bx           ; Adauga valoarea din BL (extinsa la 16 bi?i) la AX (suma totala)
+inc si               ; Trecem la urmatorul element (incrementam adresa din SI)
+loop sum_loop        ; Decrementeaza CX ?i repeta bucla daca CX > 0
+
+;-------------------------
+; Stocarea rezultatului
+;-------------------------
+mov result, ax       ; Stocam suma totala în variabila `result`
+
+;-------------------------
+; Terminarea programului
+;-------------------------
+mov ah, 4Ch          ; Func?ia DOS pentru terminare
+int 21h              ; Terminare program
+
+;-------------------------
+; Date
+;-------------------------
+data segment
+matrix db 1, 2, 3    ; Prima linie a matricei
+db 4, 5, 6    ; A doua linie a matricei
+db 7, 8, 9    ; A treia linie a matricei
+result dw ?          ; Variabila pentru stocarea sumei totale
+data ends
+
+
+
+
+; [SOURCE]: C:\emu8086\MySource\A93MATRIXsumINDIRECTaddressing.asm
