@@ -1,0 +1,58 @@
+; Implementa?i codul pentru a detecta dac? arhitectura sistemului este little-endian sau big-endian
+; Corectati afisarea pentru acest cod
+org 100h       ; Program pentru un fi?ier .com (executabil mic)
+
+;-------------------------
+; Segmentul de date
+;-------------------------
+data segment
+num dw 0x1234       ; Stocam numarul 0x1234 (16 bi?i)
+result db '?'        ; Caracter ce va indica tipul endianness-ului
+data ends
+
+;-------------------------
+; Segmentul de cod
+;-------------------------
+mov ax, @data        ; Ini?ializam segmentul de date
+mov ds, ax           ; Setam DS (Data Segment)
+
+lea si, num          ; Încarcam adresa variabilei `num` în SI
+mov al, [si]         ; Citim primul octet al variabilei în AL (octetul la adresa `num`)
+
+cmp al, 34h          ; Comparam primul octet cu 0x34 (octetul mai pu?in semnificativ al numarului 0x1234)
+je little_endian     ; Daca primul octet este 0x34, sistemul este little-endian
+jmp big_endian       ; Altfel, este big-endian
+
+;-------------------------
+; Little-endian
+;-------------------------
+little_endian:
+mov result, 'L'      ; Setam 'L' pentru little-endian
+jmp end_program       ; Sarim la sfâr?itul programului
+
+;-------------------------
+; Big-endian
+;-------------------------
+big_endian:
+mov result, 'B'      ; Setam 'B' pentru big-endian
+
+;-------------------------
+; Terminarea programului
+;-------------------------
+end_program:
+mov ah, 09h          ; Func?ia DOS 09h: afi?are mesaj
+lea dx, msg          ; Încarcam adresa mesajului în DX
+int 21h              ; Apelam func?ia DOS pentru afi?are
+
+mov ah, 4Ch          ; Terminare program
+int 21h              ; Terminare
+
+;-------------------------
+; Mesaje ?i variabile
+;-------------------------
+msg db 'Sistemul este ', result, '-endian$', 0
+
+
+
+
+; [SOURCE]: C:\emu8086\MySource\A92VerifIFlittleVbigENDIAN.asm
