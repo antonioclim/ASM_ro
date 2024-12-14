@@ -1,0 +1,110 @@
+; Declara?i variabile de diferite dimensiuni ?i afi?a?i valorile lor utilizând syscall
+org 100h       ; Program pentru un fi?ier .com (executabil mic)
+
+;-------------------------
+; Ini?ializarea segmentului de date
+;-------------------------
+mov ax, @data  ; Setam segmentul de date
+mov ds, ax     ; DS = ax (segmentul pentru accesarea datelor)
+
+;-------------------------
+; Afi?area variabilelor
+;-------------------------
+
+; Afi?am variabila de tip BYTE
+mov al, byte_var    ; Încarcam valoarea variabilei BYTE în AL
+call print_hex_byte ; Apelam subrutina pentru afi?area valorii în format hex
+
+; Afi?am un newline
+call print_newline
+
+; Afi?am variabila de tip WORD
+mov ax, word_var    ; Încarcam valoarea variabilei WORD în AX
+call print_hex_word ; Apelam subrutina pentru afi?area valorii în format hex
+
+; Afi?am un newline
+call print_newline
+
+; Afi?am variabila de tip DWORD (partea inferioara)
+mov ax, word ptr dword_var ; Încarcam partea inferioara a DWORD în AX
+call print_hex_word ; Afi?am partea inferioara
+
+; Afi?am un newline
+call print_newline
+
+; Afi?am variabila DWORD (partea superioara)
+mov ax, word ptr dword_var+2 ; Încarcam partea superioara a DWORD în AX
+call print_hex_word ; Afi?am partea superioara
+
+;-------------------------
+; Terminarea programului
+;-------------------------
+mov ah, 4Ch         ; Func?ia DOS pentru terminare
+int 21h             ; Terminare program
+
+;-------------------------
+; Subrutine
+;-------------------------
+
+; Subrutina pentru afi?area unei variabile BYTE (AL con?ine valoarea)
+print_hex_byte:
+push ax         ; Salvam valoarea originala
+mov ah, 0       ; Pregatim AH pentru conversie
+and al, 0Fh     ; Extragem nibble-ul inferior
+call nibble_to_ascii
+mov dl, al      ; Punem ASCII-ul în DL
+mov ah, 02h     ; Func?ia DOS pentru afi?are caracter
+int 21h         ; Afi?am nibble-ul inferior
+
+pop ax          ; Restauram valoarea originala
+shr al, 4       ; Deplasam nibble-ul superior în partea inferioara
+call nibble_to_ascii
+mov dl, al      ; Punem ASCII-ul în DL
+mov ah, 02h     ; Func?ia DOS pentru afi?are caracter
+int 21h         ; Afi?am nibble-ul superior
+ret
+
+; Subrutina pentru afi?area unei variabile WORD (AX con?ine valoarea)
+print_hex_word:
+push ax         ; Salvam valoarea originala
+
+; Afi?am octetul superior
+mov al, ah      ; Mutam octetul superior în AL
+call print_hex_byte
+
+; Afi?am octetul inferior
+pop ax          ; Restauram valoarea originala
+call print_hex_byte
+ret
+
+; Subrutina pentru conversia unui nibble în ASCII
+nibble_to_ascii:
+add al, '0'     ; Convertim în ASCII
+cmp al, '9'     ; Daca nibble-ul este mai mare de 9...
+jbe nibble_done ; ...sarim peste conversia în litere
+add al, 7       ; Convertim în litere hex (A-F)
+nibble_done:
+ret
+
+; Subrutina pentru afi?area unui newline
+print_newline:
+mov ah, 02h     ; Func?ia DOS pentru afi?are caracter
+mov dl, 0Dh     ; Carriage return
+int 21h
+mov dl, 0Ah     ; Line feed
+int 21h
+ret
+
+;-------------------------
+; Segmentul de date
+;-------------------------
+data segment
+byte_var db 25h          ; Variabila de tip BYTE (hex: 19)
+word_var dw 0ABCDh       ; Variabila de tip WORD (hex: ABCD)
+dword_var dd 12345678h   ; Variabila de tip DWORD (hex: 12345678)
+data ends
+
+
+
+
+; [SOURCE]: C:\emu8086\MySource\A131DIFvarsDIMENSIONSsyscall.asm
